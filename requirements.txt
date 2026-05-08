@@ -1,0 +1,39 @@
+pandas>=2.0.0
+numpy>=1.24.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+gql>=4.0.0
+aiohttp>=3.8.0
+tenacity>=8.0.0
+loguru>=0.7.0
+requests-toolbelt>=1.0.0
+scipy>=1.10.0
+
+# Real-time features
+websockets>=11.0.0
+APScheduler>=3.10.0
+
+# Blockchain monitoring
+web3>=6.0.0
+
+# Terminal UI
+rich>=13.0.0
+prompt-toolkit>=3.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Optional: For Jupyter notebooks (analysis)
+ipython>=8.0.0
+jupyter>=1.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Optional: Database
+aiosqlite>=0.19.0
+asyncpg>=0.28.0
+
+# Optional: Performance
+uvloop>=0.17.0; sys_platform != "win32"
