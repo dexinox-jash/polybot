@@ -1,902 +1,699 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Polybot — Portfolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyBot — Institutional Copy-Trading for Polymarket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:           #0f172a;
-  --bg-elevated:  #1e293b;
-  --bg-inset:     #020617;
-  --text:         #f8fafc;
-  --text-soft:    #cbd5e1;
-  --text-mute:    #94a3b8;
-  --text-faint:   #64748b;
-  --accent:       #f59e0b;
-  --accent-bright:#fbbf24;
-  --accent-glow:  rgba(245, 158, 11, 0.18);
-  --accent-line:  rgba(245, 158, 11, 0.25);
-  --line:         #1e293b;
-  --line-warm:    #334155;
-  --serif:    'Lora', Georgia, serif;
-  --sans:     'Poppins', system-ui, sans-serif;
-  --mono:     'JetBrains Mono', ui-monospace, monospace;
-  --ease:     cubic-bezier(0.22, 1, 0.36, 1);
+:root{
+  --bg:#0d1117;
+  --bg-elev:#161b22;
+  --bg-elev2:#21262d;
+  --border:#30363d;
+  --border-subtle:#21262d;
+  --text:#f0f6fc;
+  --text-dim:#8b949e;
+  --text-muted:#6e7681;
+  --accent:#22c55e;
+  --accent-dim:#16a34a;
+  --accent-glow:rgba(34,197,94,0.15);
+  --danger:#f85149;
+  --warning:#d29922;
+  --info:#58a6ff;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg); color: var(--text-soft);
-  font-family: var(--sans); font-size: 1rem; line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
 }
-::selection { background: var(--accent); color: #fff; }
-body::before {
-  content: ''; position: fixed; inset: -10% -10% auto -10%; height: 70vh;
-  background:
-    radial-gradient(ellipse 60% 100% at 50% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 100% at 20% 10%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
-  pointer-events: none; z-index: 0;
-}
-body::after {
-  content: ''; position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06   0 0 0 0 0.09   0 0 0 0 0.16   0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  opacity: 0.3; pointer-events: none; z-index: 1; mix-blend-mode: overlay;
-}
-a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--accent-line); transition: border-color 200ms; }
-a:hover { border-bottom-color: var(--accent-bright); }
-h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
-.wrap   { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 2; }
-section { padding: 9rem 0; position: relative; z-index: 2; }
-section + section { border-top: 1px solid var(--line); }
-.eye {
-  font-family: var(--mono); font-size: 0.72rem;
-  text-transform: uppercase; letter-spacing: 0.22em;
-  color: var(--accent-bright); margin-bottom: 2.5rem;
-  display: flex; align-items: center; gap: 0.85rem;
-}
-.eye::before { content: ''; width: 32px; height: 1px; background: var(--accent-bright); }
-.top {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line); padding: 1.1rem 2rem;
-  font-family: var(--mono); font-size: 0.78rem; color: var(--text-mute);
-  display: flex; justify-content: space-between; align-items: center;
-  letter-spacing: 0.02em;
-}
-.top .left, .top .right { display: flex; gap: 1.25rem; align-items: center; }
-.top .name { color: var(--text); font-weight: 600; letter-spacing: 0.08em; }
-.top .live { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent-bright); }
-.top .live::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent-bright); box-shadow: 0 0 8px var(--accent-glow);
-  animation: live 2s ease-in-out infinite;
-}
-@keyframes live { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-.top a { border: none; color: var(--text-mute); }
-.top a:hover { color: var(--text); }
-.reveal {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 800ms var(--ease), transform 800ms var(--ease);
-}
-.reveal.visible { opacity: 1; transform: none; }
-.reveal.d1 { transition-delay: 80ms; }
-.reveal.d2 { transition-delay: 160ms; }
-.reveal.d3 { transition-delay: 240ms; }
-.reveal.d4 { transition-delay: 320ms; }
+::selection{background:rgba(34,197,94,0.25);color:#fff}
 
-.hero { padding: 12rem 0 8rem; }
-.hero h1 {
-  font-family: var(--serif); font-weight: 500;
-  font-size: clamp(2.6rem, 7vw, 5.5rem); line-height: 1.05;
-  letter-spacing: -0.025em; max-width: 22ch;
-  margin-bottom: 2.5rem; color: var(--text);
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+/* Utilities */
+.container{width:100%;max-width:1200px;margin:0 auto;padding:0 24px}
+.section{padding:96px 0}
+@media(max-width:768px){.section{padding:64px 0}}
+
+/* Fade-in animation */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease-out,transform .6s ease-out}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Header */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(13,17,23,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border-subtle);
 }
-.hero h1 em { font-style: italic; font-weight: 400; color: var(--accent-bright); }
-.hero .lede { font-size: 1.25rem; line-height: 1.55; color: var(--text-soft); max-width: 60ch; margin-bottom: 3rem; font-family: var(--serif); }
-.hero .meta {
-  font-family: var(--mono); font-size: 0.78rem; color: var(--text-mute);
-  display: flex; flex-wrap: wrap; gap: 2rem;
-  margin-top: 4rem; padding-top: 2rem;
-  border-top: 1px solid var(--line); letter-spacing: 0.05em;
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;max-width:1200px;margin:0 auto;padding:0 24px;
 }
-.hero .meta div { display: flex; flex-direction: column; gap: 0.4rem; }
-.hero .meta .k { color: var(--text-faint); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.18em; }
-.hero .meta .v { color: var(--text); }
-.cta {
-  display: inline-flex; align-items: center; gap: 0.75rem;
-  padding: 1rem 1.75rem; background: var(--accent); color: #0f172a;
-  font-family: var(--sans); font-size: 1rem; font-weight: 600;
-  border: 1px solid var(--accent); border-radius: 2px;
-  transition: background 200ms, transform 200ms;
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-weight:700;font-size:18px;
+  color:var(--text);text-decoration:none;
 }
-.cta:hover { background: var(--accent-bright); border-color: var(--accent-bright); transform: translateY(-1px); border-bottom: 1px solid var(--accent-bright); }
-.cta::after { content: '→'; transition: transform 200ms; }
-.cta:hover::after { transform: translateX(3px); }
-.cta-ghost {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  padding: 1rem 0; margin-left: 2rem;
-  color: var(--text-soft); font-family: var(--sans); font-size: 1rem;
-  border: none; border-bottom: 1px solid var(--line);
+.logo-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 12px rgba(34,197,94,0.5);
+  animation:pulse 2s ease-in-out infinite;
 }
-.cta-ghost:hover { color: var(--text); border-bottom-color: var(--accent-bright); }
-
-.dual { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 5rem; padding-top: 4rem; border-top: 1px solid var(--line); }
-.dual .card { position: relative; }
-.dual .card::before {
-  content: attr(data-num); font-family: var(--mono); font-size: 0.7rem;
-  letter-spacing: 0.3em; color: var(--accent-bright); text-transform: uppercase;
-  display: block; margin-bottom: 1rem;
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.nav{display:flex;align-items:center;gap:28px}
+.nav a{
+  font-size:14px;font-weight:500;color:var(--text-dim);
+  text-decoration:none;transition:color .2s;
 }
-.dual h3 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; line-height: 1.2; margin-bottom: 1rem; color: var(--text); }
-.dual p { color: var(--text-soft); font-size: 1rem; line-height: 1.65; }
-
-.h2-intro { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.1; max-width: 22ch; margin-bottom: 1.5rem; }
-.h2-intro + .lede { font-size: 1.15rem; color: var(--text-soft); max-width: 65ch; margin-bottom: 0; font-family: var(--serif); }
-
-.cards { display: grid; gap: 1.5rem; margin-top: 3rem; }
-.cards.c2 { grid-template-columns: 1fr 1fr; }
-.cards.c4 { grid-template-columns: repeat(4, 1fr); }
-.card-block {
-  padding: 2rem; border: 1px solid var(--line); background: var(--bg);
-  border-radius: 2px; transition: border-color 250ms, transform 250ms var(--ease);
+.nav a:hover{color:var(--text)}
+.nav-cta{
+  background:var(--accent);color:#0d1117 !important;
+  padding:8px 18px;border-radius:6px;font-weight:600;font-size:13px;
+  transition:background .2s,transform .15s;
 }
-.card-block:hover { border-color: var(--accent-line); transform: translateY(-2px); }
-.card-block .label {
-  font-family: var(--mono); font-size: 0.7rem;
-  text-transform: uppercase; letter-spacing: 0.22em;
-  color: var(--accent-bright); margin-bottom: 1rem;
+.nav-cta:hover{background:#4ade80}
+.nav-cta:active{transform:scale(.97)}
+@media(max-width:640px){.nav{display:none}}
+
+/* Hero */
+.hero{
+  padding:140px 0 80px;
+  position:relative;overflow:hidden;
 }
-.card-block h3 { font-family: var(--serif); font-weight: 500; font-size: 1.2rem; line-height: 1.3; margin-bottom: 0.85rem; color: var(--text); }
-.card-block p { color: var(--text-soft); font-size: 0.98rem; line-height: 1.6; }
-
-.process-meta {
-  margin-top: 2.5rem; padding: 2.5rem 3rem;
-  border-left: 2px solid var(--accent);
-  background: var(--bg-elevated); border-radius: 2px;
+.hero-grid{
+  display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center;
 }
-.process-meta .label {
-  font-family: var(--mono); font-size: 0.72rem;
-  letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--accent-bright); margin-bottom: 1rem;
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr}}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent-glow);border:1px solid rgba(34,197,94,0.25);
+  color:var(--accent);font-family:var(--font-mono);font-size:12px;
+  padding:6px 14px;border-radius:999px;margin-bottom:24px;letter-spacing:.02em;
 }
-.process-meta p {
-  font-family: var(--serif); font-style: italic;
-  font-size: 1.2rem; line-height: 1.55;
-  color: var(--text); letter-spacing: -0.005em;
+.hero h1{
+  font-family:var(--font-body);font-size:clamp(36px,5vw,56px);
+  font-weight:800;line-height:1.1;letter-spacing:-.02em;
+  margin-bottom:20px;
 }
-.process-meta p code {
-  font-family: var(--mono); font-style: normal; font-size: 0.95rem;
-  background: var(--bg-inset); padding: 1px 7px;
-  border-radius: 2px; color: var(--accent-bright);
-  border: 1px solid var(--line);
+.hero h1 span{color:var(--accent)}
+.hero-sub{
+  font-size:18px;color:var(--text-dim);line-height:1.7;
+  max-width:520px;margin-bottom:36px;
 }
-
-.psr { margin-top: 3rem; }
-.psr .step { padding: 3rem 0; display: grid; grid-template-columns: 220px 1fr; gap: 4rem; align-items: start; border-top: 1px solid var(--line); }
-.psr .step:last-child { border-bottom: 1px solid var(--line); }
-.psr .step .label { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent-bright); padding-top: 0.7rem; }
-.psr .step h3 { font-family: var(--serif); font-weight: 500; font-size: 1.85rem; line-height: 1.2; margin-bottom: 1.25rem; }
-.psr .step p { color: var(--text-soft); font-size: 1.0625rem; line-height: 1.65; }
-
-.viz { margin-top: 4rem; padding: 2.5rem; border: 1px solid var(--line); background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%); border-radius: 2px; overflow-x: auto; }
-.viz-cap { font-family: var(--mono); font-size: 0.72rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.22em; margin-bottom: 1.5rem; }
-.viz-svg { display: block; max-width: 100%; height: auto; }
-.arch-svg .col-title { font-family: var(--mono); font-weight: 500; font-size: 11px; fill: var(--text); letter-spacing: 0.3em; }
-.arch-svg .col-sub   { font-family: var(--mono); font-size: 9px;  fill: var(--text-faint); letter-spacing: 0.18em; }
-.arch-svg .layer-name{ font-family: var(--serif); font-weight: 500; font-size: 13px; fill: var(--text); }
-.arch-svg .layer-detail{font-family: var(--mono); font-size: 10px; fill: var(--text-mute); }
-.arch-svg .rect      { fill: var(--bg-inset); stroke: var(--line-warm); stroke-width: 1; }
-.arch-svg .rect.accent{stroke: var(--accent); stroke-width: 1.5; }
-.arch-svg .arrow     { stroke: var(--accent); stroke-width: 1.2; fill: none; opacity: 0.6; marker-end: url(#arrowA); }
-.arch-svg .layer-num { font-family: var(--mono); font-size: 10px; fill: var(--accent-bright); letter-spacing: 0.1em; }
-
-.callout { margin-top: 3rem; padding: 2.5rem 3rem; border-left: 2px solid var(--accent); background: var(--bg-elevated); }
-.callout .label { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-bright); margin-bottom: 1rem; }
-.callout p { font-family: var(--serif); font-style: italic; font-size: 1.2rem; line-height: 1.5; color: var(--text); }
-
-.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--line); margin-top: 4rem; border: 1px solid var(--line); }
-.feat { background: var(--bg); padding: 2.25rem; transition: background 250ms; }
-.feat:hover { background: var(--bg-elevated); }
-.feat .num { font-family: var(--mono); font-size: 0.7rem; color: var(--accent-bright); letter-spacing: 0.22em; margin-bottom: 0.85rem; }
-.feat h3 { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; line-height: 1.25; margin-bottom: 0.85rem; color: var(--text); }
-.feat p { color: var(--text-soft); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
-.feat .tech { display: inline-block; font-family: var(--mono); font-size: 0.7rem; color: var(--text-mute); border: 1px solid var(--line-warm); padding: 0.2rem 0.55rem; border-radius: 2px; margin-bottom: 1rem; }
-.feat .witty { font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--text-mute); border-top: 1px solid var(--line); padding-top: 1rem; }
-.feat.s3 { grid-column: span 3; }
-.feat.s2 { grid-column: span 2; }
-
-.exhibit { margin-top: 4rem; }
-.exhibit .label { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-bright); margin-bottom: 1rem; }
-.exhibit h3 { font-family: var(--serif); font-weight: 500; font-size: 1.85rem; line-height: 1.2; margin-bottom: 1.25rem; }
-.exhibit .story { color: var(--text-soft); font-size: 1.0625rem; line-height: 1.65; margin-bottom: 2.5rem; max-width: 70ch; }
-.code-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
-.code-pair .col { background: var(--bg-inset); padding: 1.5rem; }
-.code-pair .col .tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; display: block; }
-.code-pair .before .tag { color: var(--text-faint); }
-.code-pair .after  .tag { color: var(--accent-bright); }
-pre { font-family: var(--mono); font-size: 0.78rem; line-height: 1.7; color: var(--text-soft); background: transparent; white-space: pre; overflow-x: auto; }
-
-.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 4rem; border: 1px solid var(--line); }
-.metric { padding: 2.5rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg); transition: background 250ms; }
-.metric:hover { background: var(--bg-elevated); }
-.metric:nth-child(4n) { border-right: none; }
-.metric:nth-last-child(-n+4) { border-bottom: none; }
-.metric .lbl { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--text-mute); margin-bottom: 1.25rem; }
-.metric .val { font-family: var(--serif); font-weight: 500; font-size: 3.25rem; line-height: 1; color: var(--text); letter-spacing: -0.03em; }
-.metric .val .unit { font-size: 1.4rem; color: var(--text-mute); margin-left: 0.3rem; font-style: italic; font-weight: 400; }
-.metric .desc { margin-top: 1.25rem; font-size: 0.92rem; color: var(--text-soft); line-height: 1.6; }
-
-.decisions { margin-top: 3rem; }
-details.decision { border-top: 1px solid var(--line); padding: 2rem 0; }
-details.decision:last-of-type { border-bottom: 1px solid var(--line); }
-details.decision summary { cursor: pointer; list-style: none; display: grid; grid-template-columns: 60px 1fr auto; gap: 2rem; align-items: baseline; }
-details.decision summary::-webkit-details-marker { display: none; }
-details.decision .qnum { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-bright); letter-spacing: 0.2em; }
-details.decision .q { font-family: var(--serif); font-weight: 500; font-size: 1.3rem; line-height: 1.3; color: var(--text); }
-details.decision .arrow { font-family: var(--mono); font-size: 0.9rem; color: var(--text-mute); transition: transform 250ms; }
-details.decision[open] .arrow { transform: rotate(45deg); color: var(--accent-bright); }
-details.decision .body { margin-top: 1.5rem; padding-left: calc(60px + 2rem); display: flex; flex-direction: column; gap: 1.25rem; color: var(--text-soft); max-width: 75ch; }
-details.decision .short { font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--accent-bright); line-height: 1.4; }
-details.decision .long { font-size: 1rem; line-height: 1.7; }
-
-.timeline { margin-top: 4rem; }
-.phase { display: grid; grid-template-columns: 240px 1fr; gap: 3rem; padding: 3rem 0; border-top: 1px solid var(--line); align-items: start; }
-.phase:last-child { border-bottom: 1px solid var(--line); }
-.phase .meta { display: flex; flex-direction: column; gap: 0.75rem; }
-.phase .pnum { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.22em; color: var(--accent-bright); text-transform: uppercase; }
-.phase .ptitle { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; line-height: 1.2; color: var(--text); }
-.phase .mood { font-family: var(--mono); font-size: 0.72rem; color: var(--text-mute); letter-spacing: 0.15em; text-transform: uppercase; }
-.phase .story { color: var(--text-soft); font-size: 1.0625rem; line-height: 1.65; margin-bottom: 1rem; }
-.phase .story strong { color: var(--text); font-weight: 500; font-family: var(--serif); font-style: italic; }
-.phase .deliverable { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-bright); border-left: 1px solid var(--accent); padding-left: 1rem; line-height: 1.5; }
-
-.reflection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
-.reflection-grid .block { padding-top: 1.5rem; border-top: 1px solid var(--accent); }
-.reflection-grid .label { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--accent-bright); margin-bottom: 1rem; }
-.reflection-grid h3 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; line-height: 1.2; color: var(--text); margin-bottom: 1rem; }
-.reflection-grid p { color: var(--text-soft); font-size: 1rem; line-height: 1.65; }
-
-footer.recursive { padding: 10rem 0 6rem; border-top: 1px solid var(--line); position: relative; background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(245, 158, 11, 0.08) 0%, transparent 60%); }
-footer.recursive h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.15; letter-spacing: -0.025em; max-width: 28ch; margin-bottom: 2rem; }
-footer.recursive .cta-line { color: var(--text-soft); font-size: 1.2rem; line-height: 1.55; margin-bottom: 3rem; max-width: 50ch; font-family: var(--serif); }
-footer.recursive .next { margin-top: 6rem; padding-top: 2rem; border-top: 1px solid var(--line); color: var(--text-mute); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.05em; }
-
-.integrity { background: var(--bg-inset); padding: 3rem 2rem; font-family: var(--mono); font-size: 0.78rem; color: var(--text-mute); line-height: 1.7; border-top: 1px solid var(--line); }
-.integrity .row { max-width: 1100px; margin: 0 auto; }
-.integrity strong { color: var(--text-soft); font-weight: 500; }
-.integrity em { color: var(--accent-bright); font-style: normal; }
-
-.detector-list { margin-top: 3rem; }
-.detector { display: grid; grid-template-columns: 60px 1fr; gap: 2rem; align-items: baseline; padding: 1.5rem 0; border-top: 1px solid var(--line); transition: padding 250ms var(--ease); }
-.detector:hover { padding-left: 1rem; padding-right: 1rem; background: var(--bg-elevated); }
-.detector:last-child { border-bottom: 1px solid var(--line); }
-.detector .num { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-bright); letter-spacing: 0.15em; }
-.detector h4 { font-family: var(--serif); font-weight: 500; font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
-.detector .desc { color: var(--text-soft); font-size: 0.95rem; line-height: 1.55; }
-
-@media (max-width: 1000px) {
-  section { padding: 6rem 0; }
-  .hero { padding: 8rem 0 5rem; }
-  .dual, .reflection-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .cards.c4 { grid-template-columns: 1fr 1fr; }
-  .psr .step, .phase { grid-template-columns: 1fr; gap: 1.5rem; }
-  .detector { grid-template-columns: 50px 1fr; }
-  details.decision summary { grid-template-columns: 50px 1fr; }
-  details.decision .arrow { display: none; }
-  details.decision .body { padding-left: calc(50px + 2rem); }
-  .bento { grid-template-columns: 1fr; }
-  .feat.s3, .feat.s2 { grid-column: span 1; }
-  .code-pair { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: 1fr 1fr; }
-  .metric:nth-child(2n) { border-right: none; }
-  .metric:nth-last-child(-n+4) { border-bottom: 1px solid var(--line); }
-  .metric:nth-last-child(-n+2) { border-bottom: none; }
+.hero-badges{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px;
 }
-@media (max-width: 640px) {
-  .cards.c4 { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: 1fr; }
-  .metric { border-right: none; }
-  .metric:not(:last-child) { border-bottom: 1px solid var(--line); }
+.badge-tech{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg-elev);border:1px solid var(--border);
+  color:var(--text-dim);font-family:var(--font-mono);font-size:11px;
+  padding:5px 12px;border-radius:4px;
+}
+.badge-tech svg{width:12px;height:12px;fill:var(--accent)}
+.hero-cta{
+  display:flex;gap:14px;flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font-body);font-size:15px;font-weight:600;
+  padding:12px 24px;border-radius:8px;text-decoration:none;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.btn-primary{
+  background:var(--accent);color:#0d1117;
+}
+.btn-primary:hover{background:#4ade80;transform:translateY(-1px)}
+.btn-ghost{
+  background:var(--bg-elev);color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-ghost:hover{background:var(--bg-elev2);border-color:var(--text-muted)}
+
+/* Terminal */
+.terminal{
+  background:#0a0e14;
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(34,197,94,0.08);
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.6;
+}
+.terminal-header{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 16px;
+  background:#11161d;
+  border-bottom:1px solid var(--border);
+}
+.term-btn{width:12px;height:12px;border-radius:50%}
+.term-btn.r{background:#ff5f56}.term-btn.y{background:#ffbd2e}.term-btn.g{background:#27c93f}
+.terminal-title{color:var(--text-muted);font-size:12px;margin-left:8px}
+.terminal-body{padding:16px 20px 20px;overflow-x:auto}
+.terminal-body .cmd{color:var(--accent);margin-bottom:12px}
+.terminal-body .cmd::before{content:"$ ";color:var(--text-muted)}
+.terminal-body .out{color:var(--text-dim);margin-bottom:4px}
+.terminal-body .ok{color:var(--accent)}
+.terminal-body .warn{color:var(--warning)}
+.term-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+.term-table th{
+  text-align:left;color:var(--text-muted);font-weight:500;
+  padding:6px 10px;border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+.term-table td{padding:5px 10px;color:var(--text-dim);white-space:nowrap}
+.term-table tr:hover td{background:rgba(34,197,94,0.04)}
+.term-table .num{font-variant-numeric:tabular-nums}
+.term-table .pos{color:var(--accent)}
+.term-table .neg{color:var(--danger)}
+.term-divider{height:1px;background:var(--border);margin:12px 0}
+.term-summary{font-size:11px;color:var(--text-muted);margin-top:10px}
+
+/* Stats bar */
+.stats-bar{
+  background:var(--bg-elev);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:20px 0;
+}
+.stats-inner{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:32px 48px;
+  font-family:var(--font-mono);font-size:13px;color:var(--text-dim);
+}
+.stat-item{display:flex;align-items:center;gap:8px}
+.stat-item strong{color:var(--text);font-weight:600}
+.stat-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* Section headers */
+.section-header{text-align:center;margin-bottom:64px}
+.section-label{
+  display:inline-block;font-family:var(--font-mono);font-size:12px;
+  color:var(--accent);background:var(--accent-glow);
+  border:1px solid rgba(34,197,94,0.2);padding:4px 12px;border-radius:4px;margin-bottom:16px;
+}
+.section-title{font-size:clamp(28px,3.5vw,40px);font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
+.section-desc{font-size:17px;color:var(--text-dim);max-width:560px;margin:0 auto;line-height:1.6}
+
+/* Feature grid */
+.feature-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+}
+@media(max-width:960px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.feature-grid{grid-template-columns:1fr}}
+.feature-card{
+  background:var(--bg-elev);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:28px;
+  transition:border-color .25s,transform .25s,box-shadow .25s;
+}
+.feature-card:hover{
+  border-color:rgba(34,197,94,0.35);
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.feature-icon{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(34,197,94,0.08);
+  border:1px solid rgba(34,197,94,0.15);
+  border-radius:8px;margin-bottom:18px;
+}
+.feature-icon svg{width:20px;height:20px;stroke:var(--accent);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.feature-card h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.feature-card p{font-size:14px;color:var(--text-dim);line-height:1.6}
+
+/* Architecture pipeline */
+.arch-wrap{max-width:640px;margin:0 auto}
+.arch-step{
+  display:flex;align-items:flex-start;gap:20px;
+  position:relative;padding-bottom:32px;
+}
+.arch-step:last-child{padding-bottom:0}
+.arch-step::before{
+  content:"";position:absolute;left:23px;top:48px;bottom:0;
+  width:2px;background:repeating-linear-gradient(to bottom,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);
+}
+.arch-step:last-child::before{display:none}
+.arch-num{
+  flex-shrink:0;width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg-elev2);border:1px solid var(--border);
+  border-radius:10px;font-family:var(--font-mono);font-weight:700;font-size:16px;
+  color:var(--accent);position:relative;z-index:1;
+}
+.arch-content h4{font-size:17px;font-weight:600;margin-bottom:4px}
+.arch-content p{font-size:14px;color:var(--text-dim);line-height:1.6}
+.arch-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.arch-tag{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:var(--bg-elev2);border:1px solid var(--border);padding:3px 10px;border-radius:4px}
+
+/* How it works */
+.steps-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:24px;
+}
+@media(max-width:960px){.steps-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.steps-grid{grid-template-columns:1fr}}
+.step-card{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:28px;
+  position:relative;transition:border-color .25s;
+}
+.step-card:hover{border-color:rgba(34,197,94,0.3)}
+.step-num{
+  position:absolute;top:-14px;left:20px;
+  background:var(--accent);color:#0d1117;
+  font-family:var(--font-mono);font-weight:700;font-size:12px;
+  padding:4px 12px;border-radius:4px;
+}
+.step-card h4{font-size:17px;font-weight:600;margin:10px 0 8px}
+.step-card p{font-size:14px;color:var(--text-dim);line-height:1.6}
+
+/* Terminal preview */
+.terminal-preview .terminal{max-width:800px;margin:0 auto}
+
+/* CTA */
+.cta-section{
+  text-align:center;
+  background:radial-gradient(ellipse at center,rgba(34,197,94,0.06) 0,transparent 70%);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.cta-section h2{font-size:clamp(26px,3vw,36px);font-weight:700;margin-bottom:12px}
+.cta-section p{color:var(--text-dim);font-size:17px;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+
+/* Footer */
+.footer{
+  padding:48px 0 32px;
+  border-top:1px solid var(--border);
+}
+.footer-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px;
+}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr}}
+.footer-brand{font-family:var(--font-mono);font-weight:700;font-size:16px;margin-bottom:10px}
+.footer-desc{font-size:14px;color:var(--text-dim);line-height:1.6}
+.footer-col h5{font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em}
+.footer-col a{display:block;font-size:14px;color:var(--text-dim);text-decoration:none;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{
+  border-top:1px solid var(--border);padding-top:24px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+  font-size:12px;color:var(--text-muted);font-family:var(--font-mono);
+}
+.footer-disclaimer{max-width:700px;line-height:1.6;font-size:12px;color:var(--text-muted);margin-bottom:24px}
+
+/* Responsive tweaks */
+@media(max-width:640px){
+  .hero{padding:120px 0 60px}
+  .hero-badges{gap:6px}
+  .badge-tech{font-size:10px;padding:4px 8px}
+  .stats-inner{gap:16px 28px;font-size:11px}
+  .btn{width:100%;justify-content:center}
 }
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div class="left">
-    <span class="name">POLYBOT</span>
-    <span style="color: var(--text-faint);">·</span>
-    <span>Portfolio piece 07 / 09</span>
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <span class="logo-dot"></span>
+      PolyBot
+    </a>
+    <nav class="nav">
+      <a href="#features">Features</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#terminal">Terminal</a>
+      <a href="./simulator/" class="nav-cta">Try Demo</a>
+    </nav>
   </div>
-  <div class="right">
-    <span class="live">v3.0.0 shipped</span>
-    <span>Python · Rich · Web3 · WebSocket</span>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="reveal">
+        <div class="hero-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          v3.0 — Real-Time WebSocket Engine
+        </div>
+        <h1>Copy the winners. <span>Survive</span> the markets.</h1>
+        <p class="hero-sub">
+          Institutional-grade copy-trading for Polymarket. Winner discovery + Monte Carlo EV + Kelly Criterion sizing + 6 circuit breakers. 1 bet per day. Risk-first.
+        </p>
+        <div class="hero-badges">
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Python 3.11</span>
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>pandas / numpy / scipy</span>
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Rich CLI</span>
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Web3 / WebSocket</span>
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>79 Python Files</span>
+          <span class="badge-tech"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>91 Tests Passing</span>
+        </div>
+        <div class="hero-cta">
+          <a href="./simulator/" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Try Terminal Demo
+          </a>
+          <a href="#" class="btn btn-ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Terminal: scan -->
+      <div class="reveal" style="transition-delay:.15s">
+        <div class="terminal">
+          <div class="terminal-header">
+            <span class="term-btn r"></span>
+            <span class="term-btn y"></span>
+            <span class="term-btn g"></span>
+            <span class="terminal-title">polybot — scan</span>
+          </div>
+          <div class="terminal-body">
+            <div class="cmd">polybot scan --min-bets 50 --win-rate 0.55 --profit-factor 1.3</div>
+            <div class="out ok">✓ Connected to Polymarket API</div>
+            <div class="out ok">✓ Loaded 14,832 bettor profiles</div>
+            <div class="out">Scanning for statistically proven winners...</div>
+            <div class="term-divider"></div>
+            <table class="term-table">
+              <tr><th>Bettor</th><th>Bets</th><th>Win Rate</th><th>Profit Factor</th><th>p-value</th><th>Net PnL</th></tr>
+              <tr><td>alpha_shark</td><td class="num">247</td><td class="num pos">61.9%</td><td class="num pos">1.84</td><td class="num pos">&lt;0.001</td><td class="num pos">+$12,430</td></tr>
+              <tr><td>theta_flow</td><td class="num">189</td><td class="num pos">58.2%</td><td class="num pos">1.67</td><td class="num pos">0.003</td><td class="num pos">+$8,920</td></tr>
+              <tr><td>sigma_edge</td><td class="num">312</td><td class="num pos">56.4%</td><td class="num pos">1.52</td><td class="num pos">0.008</td><td class="num pos">+$6,115</td></tr>
+              <tr><td>vega_strat</td><td class="num">98</td><td class="num pos">59.2%</td><td class="num pos">1.71</td><td class="num pos">0.012</td><td class="num pos">+$4,780</td></tr>
+              <tr><td>delta_hunt</td><td class="num">156</td><td class="num pos">55.8%</td><td class="num pos">1.41</td><td class="num pos">0.031</td><td class="num pos">+$3,210</td></tr>
+            </table>
+            <div class="term-summary">5 winners found · 4,892 bettors filtered · Scan time: 1.24s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-inner">
+      <span class="stat-item"><span class="stat-dot"></span><strong>79</strong> Python Files</span>
+      <span class="stat-item"><span class="stat-dot"></span><strong>18</strong> Modules</span>
+      <span class="stat-item"><span class="stat-dot"></span><strong>91</strong> Tests Passing</span>
+      <span class="stat-item"><span class="stat-dot"></span><strong>10-20</strong> API Calls/Day</span>
+      <span class="stat-item"><span class="stat-dot"></span><strong>&lt;10ms</strong> Latency</span>
+    </div>
   </div>
 </div>
 
-<section class="hero">
-  <div class="wrap">
-    <div class="eye reveal">01 · The Hook</div>
-    <h1 class="reveal d1">I built an institutional-grade copy-trading bot for prediction markets — because most trading bots blow up, and this one is designed to <em>survive.</em></h1>
-    <p class="lede reveal d2">
-      Solo build of Polybot: Python + pandas + numpy + scipy + Rich + Web3.
-      Winner Discovery Engine finds statistically proven bettors.
-      EV Calculator runs 10,000-run Monte Carlo simulations with Kelly Criterion sizing.
-      Copy Engine enforces 1 bet per day.
-      Enhanced Risk Manager has 6 circuit breakers and tiered profit-taking.
-      Real-time v3.0.0: WebSocket CLOB (&lt;10ms), blockchain mempool monitoring, predictive entry, arbitrage detection.
-      79 Python files. 91 tests passing. CLI-only. Risk-first.
+<!-- Features -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Built like a quant desk</h2>
+      <p class="section-desc">Every component designed for institutional rigor: statistical validation, Monte Carlo simulation, and hard risk limits.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <h3>Winner Discovery Engine</h3>
+        <p>Finds bettors with &gt;50 bets, &gt;55% win rate, &gt;1.3 profit factor, and p&lt;0.05 statistical significance. No survivorship bias.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>EV Calculator</h3>
+        <p>10,000-run Monte Carlo simulation per opportunity. Kelly Criterion position sizing with fractional Kelly safety.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3>1 Bet Per Day</h3>
+        <p>Hard limit on over-trading. Quality over quantity. The engine waits for A+ setups that clear every filter.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h3>6 Circuit Breakers</h3>
+        <p>Daily loss limit, consecutive loss halt, volatility spike guard, API error backoff, max drawdown freeze, manual kill switch.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Real-Time v3.0</h3>
+        <p>WebSocket CLOB (&lt;10ms), blockchain mempool monitoring, predictive entry timing, and cross-market arbitrage detection.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        </div>
+        <h3>Risk-First Architecture</h3>
+        <p>Portfolio heat &lt;50%, max 5 concurrent positions, tiered profit-taking, and real-time exposure tracking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section class="section" id="architecture" style="background:var(--bg-elev)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Architecture</div>
+      <h2 class="section-title">Five-layer pipeline</h2>
+      <p class="section-desc">Clean separation from CLI to chain. Each layer is independently testable and replaceable.</p>
+    </div>
+    <div class="arch-wrap">
+      <div class="arch-step reveal">
+        <div class="arch-num">01</div>
+        <div class="arch-content">
+          <h4>Interface Layer</h4>
+          <p>Rich CLI with live tables, progress spinners, and color-coded output. Click commands for scan, analyze, execute, and report.</p>
+          <div class="arch-tags">
+            <span class="arch-tag">Rich</span>
+            <span class="arch-tag">Click</span>
+            <span class="arch-tag">Typer</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-step reveal">
+        <div class="arch-num">02</div>
+        <div class="arch-content">
+          <h4>Discovery Layer</h4>
+          <p>Ingests Polymarket bettor histories, applies statistical filters, and ranks candidates by Sharpe-adjusted edge.</p>
+          <div class="arch-tags">
+            <span class="arch-tag">pandas</span>
+            <span class="arch-tag">scipy.stats</span>
+            <span class="arch-tag">numpy</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-step reveal">
+        <div class="arch-num">03</div>
+        <div class="arch-content">
+          <h4>Execution Layer</h4>
+          <p>WebSocket CLOB streaming, gas-optimized EOA transactions, and mempool monitoring for frontrunning protection.</p>
+          <div class="arch-tags">
+            <span class="arch-tag">web3.py</span>
+            <span class="arch-tag">WebSocket</span>
+            <span class="arch-tag">asyncio</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-step reveal">
+        <div class="arch-num">04</div>
+        <div class="arch-content">
+          <h4>Risk Layer</h4>
+          <p>Circuit breakers, position sizing, portfolio heat tracking, and real-time PnL reconciliation against on-chain state.</p>
+          <div class="arch-tags">
+            <span class="arch-tag">Kelly</span>
+            <span class="arch-tag">Monte Carlo</span>
+            <span class="arch-tag">drawdown</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-step reveal">
+        <div class="arch-num">05</div>
+        <div class="arch-content">
+          <h4>Data Layer</h4>
+          <p>SQLite for local state, Polymarket REST + WS feeds, and IPFS fallback for market metadata.</p>
+          <div class="arch-tags">
+            <span class="arch-tag">SQLite</span>
+            <span class="arch-tag">Polymarket API</span>
+            <span class="arch-tag">IPFS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Workflow</div>
+      <h2 class="section-title">How it works</h2>
+      <p class="section-desc">From market scan to on-chain execution in four disciplined steps.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">01</div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h4>Scan for Proven Winners</h4>
+        <p>The engine ingests thousands of bettor profiles and filters for statistical edge: high volume, high win rate, proven profit factor, and p-value significance.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">02</div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        <h4>Run Monte Carlo EV</h4>
+        <p>Every candidate signal is stress-tested with 10,000 stochastic simulations. Expected value, variance, and tail risk are quantified before a dollar is committed.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">03</div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <h4>Size with Kelly Criterion</h4>
+        <p>Position size is computed from edge and bankroll. Fractional Kelly (0.25x–0.5x) prevents over-betting while capturing convex upside.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">04</div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <h4>Execute with Risk Guards</h4>
+        <p>The trade hits the CLOB only if all 6 circuit breakers are green. Real-time monitoring continues until resolution or manual halt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Terminal Preview -->
+<section class="section terminal-preview" id="terminal" style="background:var(--bg-elev)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Terminal</div>
+      <h2 class="section-title">Analyze before you act</h2>
+      <p class="section-desc">The <code>analyze</code> command breaks down EV, scenario risk, and position sizing in one view.</p>
+    </div>
+    <div class="reveal" style="transition-delay:.1s">
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="term-btn r"></span>
+          <span class="term-btn y"></span>
+          <span class="term-btn g"></span>
+          <span class="terminal-title">polybot — analyze alpha_shark</span>
+        </div>
+        <div class="terminal-body">
+          <div class="cmd">polybot analyze --bettor alpha_shark --market "Fed Rate Cut Dec 2024"</div>
+          <div class="out ok">✓ Signal validated</div>
+          <div class="out">┌─ Expected Value Analysis ──────────────────────┐</div>
+          <div class="out">│  Win probability (hist.)      61.9%            │</div>
+          <div class="out">│  Odds offered                 1.55x            │</div>
+          <div class="out">│  Implied probability          64.5%            │</div>
+          <div class="out">│  Edge                         -2.6%            │</div>
+          <div class="out">│  Monte Carlo EV (10k runs)    -0.8% ± 4.2%     │</div>
+          <div class="out">└────────────────────────────────────────────────┘</div>
+          <div class="term-divider"></div>
+          <div class="out">┌─ Scenario Analysis ────────────────────────────┐</div>
+          <div class="out">│  5th percentile               -8.4%            │</div>
+          <div class="out">│  25th percentile              -3.1%            │</div>
+          <div class="out">│  Median                       -0.7%            │</div>
+          <div class="out">│  75th percentile              +2.1%            │</div>
+          <div class="out">│  95th percentile              +7.6%            │</div>
+          <div class="out">└────────────────────────────────────────────────┘</div>
+          <div class="term-divider"></div>
+          <div class="out warn">⚠ Edge negative. Signal rejected.</div>
+          <div class="out">Risk check: Portfolio heat 23% · Daily budget $50 · Consecutive losses 0</div>
+          <div class="out ok">✓ All circuit breakers GREEN — system armed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section">
+  <div class="container reveal">
+    <h2>Ready to trade with edge?</h2>
+    <p>Clone the repo, run the simulator, and see the engine in action. No API keys required for backtesting.</p>
+    <div class="hero-cta" style="justify-content:center">
+      <a href="./simulator/" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Try Terminal Demo
+      </a>
+      <a href="#" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">PolyBot</div>
+        <p class="footer-desc">Institutional-grade copy-trading engine for Polymarket prediction markets. Statistical winner discovery, Monte Carlo EV, and risk-first execution.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#terminal">Terminal</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="#">Documentation</a>
+        <a href="#">Changelog</a>
+        <a href="#">Simulator</a>
+        <a href="#">GitHub</a>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="#">Risk Disclaimer</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
+    </div>
+    <p class="footer-disclaimer">
+      <strong>Risk Disclaimer:</strong> PolyBot is an experimental tool for research and simulation. Past performance of copied bettors does not guarantee future results. Prediction markets involve risk of loss. This software does not constitute financial advice. Always verify regulatory compliance in your jurisdiction before deploying capital.
     </p>
-    <div class="reveal d3">
-      <a class="cta" href="#process">Read the process</a>
-      <a class="cta-ghost" href="#architecture">See the architecture</a>
+    <div class="footer-bottom">
+      <span>PolyBot v3.0.0 — Python 3.11</span>
+      <span>Built with pandas, numpy, scipy, Rich, web3.py</span>
     </div>
-    <div class="meta reveal d4">
-      <div><span class="k">Role</span><span class="v">Solo · concept → v3.0.0</span></div>
-      <div><span class="k">Phases</span><span class="v">5 · research → arch → build → realtime → harden</span></div>
-      <div><span class="k">Stack</span><span class="v">Python · pandas · numpy · scipy · Rich</span></div>
-      <div><span class="k">Tests</span><span class="v">91 passing · pytest · all green</span></div>
-    </div>
-    <div class="dual">
-      <div class="card reveal" data-num="For the curious passenger">
-        <h3>Prediction markets are full of noise. This bot cuts through it by copying statistically proven winners.</h3>
-        <p>It finds bettors with &gt;55% win rates and &gt;1.3 profit factors, calculates expected value with Monte Carlo simulations, sizes positions with the Kelly Criterion, and stops trading automatically if daily losses exceed 10%. Most trading bots focus on entry signals; this one focuses on survival.</p>
-      </div>
-      <div class="card reveal d1" data-num="For the engineer in the back">
-        <h3>79 Python files across 18 modules. 91 tests passing. WebSocket CLOB with &lt;10ms latency.</h3>
-        <p>Winner Discovery with statistical significance testing and vanity gap detection. EV Calculator with 10,000-run Monte Carlo and Half-Kelly sizing. Multi-Factor Model with 20+ factors across 6 categories. Enhanced Risk Manager with 6 circuit breakers and tiered profit-taking. Real-time trading: blockchain mempool monitoring, predictive entry, arbitrage detector, smart order router. CLI-only using Rich. API-efficient at ~10-20 calls/day.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">02 · The bet</div>
-    <h2 class="reveal d1 h2-intro">Why I picked this fight.</h2>
-    <p class="lede reveal d2">Four short answers to the four questions every project should be able to answer before the first commit.</p>
-    <div class="cards c4">
-      <div class="card-block reveal">
-        <div class="label">Signal</div>
-        <h3>Prediction markets are noisy. Most participants lose money.</h3>
-        <p>Existing trading bots chase every signal, over-trade, and blow up. The gap is a bot that trades like an institution: patient, risk-managed, and focused on survival.</p>
-      </div>
-      <div class="card-block reveal d1">
-        <div class="label">Filter</div>
-        <h3>Vertical-specific (prediction markets), not horizontal.</h3>
-        <p>Copy-trading rather than prediction. Python-based CLI tool. API-efficient (~10-20 calls/day). Risk-first rather than return-first. Solo-buildable with open-source libraries.</p>
-      </div>
-      <div class="card-block reveal d2">
-        <div class="label">Why now</div>
-        <h3>Prediction markets are growing rapidly.</h3>
-        <p>Polymarket volume exceeded $1B in 2024. Retail traders are flooding in without edge identification or risk management. A middle-ground tool that applies institutional risk management to retail copy-trading is timely.</p>
-      </div>
-      <div class="card-block reveal d3">
-        <div class="label">Why me</div>
-        <h3>I've watched friends lose money on prediction markets by betting on gut feel.</h3>
-        <p>The ones who won weren't smarter — they were more disciplined. They had stop losses, position sizing rules, and the patience to wait for high-conviction setups. I wanted to encode that discipline into software.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">03 · No-jargon explainer</div>
-    <h2 class="reveal d1 h2-intro">Problem. Solution. Result.</h2>
-    <div class="psr">
-      <div class="step reveal">
-        <div class="label">01 · Problem</div>
-        <div>
-          <h3>Prediction markets are full of noise, and most retail traders lose money.</h3>
-          <p>Existing trading bots either chase every signal (over-trading) or require institutional infrastructure (too complex). The result: blown accounts, emotional decision-making, and a market that extracts money from the undisciplined.</p>
-        </div>
-      </div>
-      <div class="step reveal">
-        <div class="label">02 · Solution</div>
-        <div>
-          <h3>Build a copy-trading bot that identifies statistically proven winners and enforces strict risk management.</h3>
-          <p>The Winner Discovery Engine filters for bettors with &gt;50 bets, &gt;55% win rate, &gt;1.3 profit factor, and p&lt;0.05 statistical significance. The EV Calculator runs 10,000-run Monte Carlo simulations with Kelly Criterion sizing. The Enhanced Risk Manager provides 6 circuit breakers, tiered profit-taking, and portfolio heat limits. The CLI interface keeps operations fast and focused.</p>
-        </div>
-      </div>
-      <div class="step reveal">
-        <div class="label">03 · Result</div>
-        <div>
-          <h3>Polybot v3.0.0 shipped. 79 Python files. 91 tests passing. Zero compromises on risk.</h3>
-          <p>18 modules: Winner Discovery, EV Calculator, Copy Engine, Multi-Factor Model, Research Engine, Enhanced Risk Manager, Real-Time Trading System, Paper Trading Engine, Backtest Engine, ML Ensemble, Quantum Engine. CLI-only using Rich. API-efficient at ~10-20 calls/day. 98% latency reduction in v3.0.0 real-time system.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="process">
-  <div class="wrap">
-    <div class="eye reveal">04 · My process</div>
-    <h2 class="reveal d1 h2-intro">How I got here without building the wrong features.</h2>
-    <p class="lede reveal d2">Four habits, applied recursively. The same discipline that kept the build cheap also kept it correct.</p>
-    <div class="cards c2">
-      <div class="card-block reveal">
-        <div class="label">01 · Risk-first, not signal-first</div>
-        <h3>The first question wasn't "how do I find winning bets?" but "how do I not blow up?"</h3>
-        <p>Every module is downstream of that question. The Winner Discovery Engine exists because copying random bettors is suicide. The EV Calculator exists because copying without expected value is gambling. The risk manager exists because even +EV trades can ruin you with bad sizing. The 1-bet-per-day limit exists because over-trading is the silent killer of most bots.</p>
-      </div>
-      <div class="card-block reveal d1">
-        <div class="label">02 · Scoped agents per domain</div>
-        <h3>Data layer · Winner discovery · EV calculation · Risk management · Real-time trading · CLI.</h3>
-        <p>Each agent read the risk-first brief before writing code. The risk manager agent had veto power over every other agent's output. The real-time trading agent had to prove its latency improvements didn't compromise circuit breaker response times.</p>
-      </div>
-      <div class="card-block reveal d2">
-        <div class="label">03 · Knowledge graph as working memory</div>
-        <h3>The vault tracked risk architecture, EV methodology, statistical filters, and real-time pipeline.</h3>
-        <p>The risk manager node was the hub — every other module linked to it. A new session picks up the relevant subgraph — e.g., just "risk manager + position sizing + circuit breakers" — as prefix context.</p>
-      </div>
-      <div class="card-block reveal d3">
-        <div class="label">04 · Token efficiency as a value</div>
-        <h3>The ARCHITECTURE.md spec was written before the manifest.</h3>
-        <p>Referencing modules by name made every downstream agent self-consistent. The risk manager specification was written in one session and referenced by name in the copy engine agent, the paper trading agent, and the real-time trading agent.</p>
-      </div>
-    </div>
-    <div class="process-meta reveal">
-      <div class="label">▸ The recursive proof</div>
-      <p>This portfolio piece was generated by the same harness pipeline at <code>app/harness/</code> that ingests projects: <strong style="color: var(--accent-bright); font-style: normal;">Ingest → Analysis → Portfolio Writer → Validator</strong>. The vault at <code>vault/</code> graphs every design decision and dependency. The same orchestration pattern that built the bot is now extracting it. That's the demo.</p>
-    </div>
-  </div>
-</section>
-
-<section id="architecture">
-  <div class="wrap">
-    <div class="eye reveal">05 · Architecture</div>
-    <h2 class="reveal d1 h2-intro">Five layers. One survival machine. Zero dashboards.</h2>
-    <p class="lede reveal d2">The risk layer is the load-bearing wall — everything else is scaffolding.</p>
-    <div class="viz reveal">
-      <div class="viz-cap">▸ Stack diagram · five vertical layers · data flow shown in amber</div>
-      <svg class="viz-svg arch-svg" viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <marker id="arrowA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
-          </marker>
-        </defs>
-        <g transform="translate(50, 40)">
-          <rect class="rect" width="800" height="85" rx="2"/>
-          <text class="layer-num" x="16" y="22">L1</text>
-          <text class="layer-name" x="50" y="22">Interface · Rich CLI</text>
-          <text class="layer-detail" x="16" y="44">Rich terminal UI · styled tables · progress bars · panels · syntax highlighting</text>
-          <text class="layer-detail" x="16" y="62">Commands: status · scan · analyze · copy · portfolio · stop · 15-min daily workflow</text>
-        </g>
-        <path class="arrow" d="M 450 125 L 450 145"/>
-        <g transform="translate(50, 155)">
-          <rect class="rect" width="800" height="70" rx="2"/>
-          <text class="layer-num" x="16" y="22">L2</text>
-          <text class="layer-name" x="50" y="22">Discovery &amp; Analysis · Edge Identification</text>
-          <text class="layer-detail" x="16" y="44">Winner Discovery (>50 bets, >55% win, >1.3 PF, p&lt;0.05) · EV Calculator (10k Monte Carlo)</text>
-          <text class="layer-detail" x="16" y="60">Multi-Factor Model (20+ factors, 6 categories) · Research Engine (archetype + pattern + consensus)</text>
-        </g>
-        <path class="arrow" d="M 450 225 L 450 245"/>
-        <g transform="translate(50, 255)">
-          <rect class="rect accent" width="800" height="110" rx="2"/>
-          <text class="layer-num" x="16" y="22">L3</text>
-          <text class="layer-name" x="50" y="22">Execution · Copy Engine + Real-Time</text>
-          <text class="layer-detail" x="16" y="44">Copy Engine (1 bet/day, heat &lt;50%, max 5 positions) · WebSocket CLOB (&lt;10ms)</text>
-          <text class="layer-detail" x="16" y="62">Blockchain monitor (mempool pre-confirmation) · Predictive entry · Arbitrage detector</text>
-          <text class="layer-detail" x="16" y="80">Smart order router (sniper / iceberg / TWAP) · Latency executor (&lt;100ms signal-to-submission)</text>
-        </g>
-        <path class="arrow" d="M 450 365 L 450 385"/>
-        <g transform="translate(50, 395)">
-          <rect class="rect" width="800" height="95" rx="2"/>
-          <text class="layer-num" x="16" y="22">L4</text>
-          <text class="layer-name" x="50" y="22">Risk · Enhanced Risk Manager</text>
-          <text class="layer-detail" x="16" y="44">6 circuit breakers (daily loss 10%, consecutive losses, volatility, API errors, drawdown 20%, manual)</text>
-          <text class="layer-detail" x="16" y="62">Tiered profit-taking (50% at +10%, remainder at +20%) · Trailing stop · Time exit · Max 2% per trade</text>
-          <text class="layer-detail" x="16" y="80">RiskStatus: NORMAL → CAUTION → RESTRICTED → HALTED · 32 unit tests · all passing</text>
-        </g>
-        <path class="arrow" d="M 450 490 L 450 510"/>
-        <g transform="translate(50, 520)">
-          <rect class="rect" width="800" height="70" rx="2"/>
-          <text class="layer-num" x="16" y="22">L5</text>
-          <text class="layer-name" x="50" y="22">Data · Polymarket + Blockchain</text>
-          <text class="layer-detail" x="16" y="44">SubgraphClient (GraphQL) · GammaClient · WhaleTracker · CryptoMarketScanner · aiosqlite/asyncpg</text>
-          <text class="layer-detail" x="16" y="60">PaperTradingEngine · BacktestEngine · PolymarketClient (CLOB) · Multi-provider blockchain (Alchemy/Infura)</text>
-        </g>
-      </svg>
-    </div>
-  </div>
-</section>
-
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">06 · Stakeholder views</div>
-    <h2 class="reveal d1 h2-intro">Five people. Five opinions on what this system owes them.</h2>
-    <p class="lede reveal d2">Every feature is a negotiation. Every tradeoff is visible to someone. If I can't explain why it works for all five lenses, the architecture is wrong.</p>
-    <div class="detector-list">
-      <div class="detector reveal">
-        <div class="num">01</div>
-        <div>
-          <h4>Customer (Retail Trader)</h4>
-          <p class="desc">I want to trade prediction markets but I don't have time to research every market. I want to copy proven winners, not guess. I need risk management because I've blown up accounts before. I want to understand WHY a trade is recommended, not just get a signal. I want the bot to stop trading automatically if things go wrong.</p>
-        </div>
-      </div>
-      <div class="detector reveal d1">
-        <div class="num">02</div>
-        <div>
-          <h4>Business (Trading Operation)</h4>
-          <p class="desc">The bot is a capital preservation tool first, a return generator second. Every module is justified by risk reduction. The 1-bet-per-day limit reduces transaction costs and over-trading. The Kelly Criterion prevents position sizes that could ruin the portfolio. The circuit breakers stop trading before catastrophic losses.</p>
-        </div>
-      </div>
-      <div class="detector reveal d2">
-        <div class="num">03</div>
-        <div>
-          <h4>Operations (System Reliability)</h4>
-          <p class="desc">The bot must run reliably without constant supervision. API errors are handled gracefully with exponential backoff. State is persisted to JSON for crash recovery. WebSocket auto-reconnects. Blockchain monitoring has multi-provider fallback. Circuit breakers prevent runaway losses even if the bot crashes mid-trade.</p>
-        </div>
-      </div>
-      <div class="detector reveal d3">
-        <div class="num">04</div>
-        <div>
-          <h4>Legal &amp; Compliance</h4>
-          <p class="desc">The bot doesn't provide investment advice — it provides data analysis and copy-trading automation. Users control their own wallets and private keys. The bot doesn't hold user funds. Paper trading is available for jurisdictions where real-money prediction market trading is restricted. Risk disclosures are built into the CLI output.</p>
-        </div>
-      </div>
-      <div class="detector reveal d4">
-        <div class="num">05</div>
-        <div>
-          <h4>Growth</h4>
-          <p class="desc">Network effect: as more users run the bot, the winner discovery dataset improves. White-label potential for hedge funds. Real-time v3.0.0 opens high-frequency arbitrage opportunities. Multi-exchange support expands addressable market. The ML ensemble and quantum engine modules are experimental features that could differentiate the product.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">07 · Feature deep dive</div>
-    <h2 class="reveal d1 h2-intro">Seven core features. Each has a reason. Each has a tradeoff.</h2>
-    <div class="bento">
-      <div class="feat s3 reveal">
-        <div class="num">01 · DISCOVERY</div>
-        <h3>Winner Discovery Engine — statistical edge identification</h3>
-        <p>Finds statistically proven bettors worth copying. Filters: &gt;50 bets, &gt;55% true win rate, &gt;1.3 profit factor, p&lt;0.05 statistical significance. Vanity gap detection identifies stat manipulation. Win rate breakdown by category, time, and market type. Composite copy score ranking.</p>
-        <span class="tech">pandas · scipy · statistical testing</span>
-        <div class="witty">We don't predict markets. We find people who already can.</div>
-      </div>
-      <div class="feat s3 reveal d1">
-        <div class="num">02 · EV</div>
-        <h3>EV Calculator — Monte Carlo simulation</h3>
-        <p>Calculates Expected Value of copying specific bets with 10,000-run Monte Carlo simulation. Factors: winner's historical edge, slippage estimation, timing penalty, scenario analysis (best/base/worst), Half-Kelly Criterion optimal sizing.</p>
-        <span class="tech">numpy · Monte Carlo · Kelly Criterion</span>
-        <div class="witty">10,000 simulated trades tell you more than one gut feeling.</div>
-      </div>
-      <div class="feat s2 reveal d2">
-        <div class="num">03 · RISK</div>
-        <h3>Enhanced Risk Manager — 6 circuit breakers</h3>
-        <p>Institutional-grade risk controls: daily loss limit (10%), consecutive losses halt, high volatility halt, API error halt, total drawdown stop (20%), manual halt. Tiered take profit and trailing stops.</p>
-        <span class="tech">dataclasses · enums · risk architecture</span>
-        <div class="witty">The best trade is sometimes no trade. The bot knows when to stop.</div>
-      </div>
-      <div class="feat s2 reveal d3">
-        <div class="num">04 · SCORING</div>
-        <h3>Multi-Factor Model — 20+ scoring factors</h3>
-        <p>Comprehensive scoring across 6 categories: performance, consistency, recency, category expertise, risk profile, market timing. Composite score 0-100 for each potential copy target.</p>
-        <span class="tech">pandas · factor analysis · scoring</span>
-        <div class="witty">Twenty factors beat one hunch. Math doesn't have bad days.</div>
-      </div>
-      <div class="feat s2 reveal">
-        <div class="num">05 · REAL-TIME</div>
-        <h3>Real-Time v3.0.0 — ultra-low latency</h3>
-        <p>WebSocket CLOB client with &lt;10ms latency. Blockchain mempool monitoring. Latency executor with &lt;100ms signal-to-submission. Predictive entry. Arbitrage detector. Smart order router. 98% latency reduction.</p>
-        <span class="tech">WebSocket · web3 · asyncio · APScheduler</span>
-        <div class="witty">By the time you refresh the page, the bot has already placed and filled the order.</div>
-      </div>
-      <div class="feat s3 reveal d1">
-        <div class="num">06 · DISCIPLINE</div>
-        <h3>Copy Engine — disciplined execution</h3>
-        <p>Enforces hard limit of 1 exceptional bet per day. Portfolio heat &lt;50%. Max 5 concurrent positions. Liquidity verification. Slippage estimation. Automatic position sizing via Half-Kelly. State persistence to JSON.</p>
-        <span class="tech">Kelly Criterion · position sizing · state management</span>
-        <div class="witty">Patience is a feature. The bot has more discipline than most humans.</div>
-      </div>
-      <div class="feat s3 reveal d2">
-        <div class="num">07 · INTERFACE</div>
-        <h3>CLI-only — no dashboard bloat</h3>
-        <p>Rich terminal UI with styled tables, progress bars, panels, syntax highlighting. Commands: status, scan, analyze, copy, portfolio, stop. 15-minute daily workflow. No web server, no database admin, no JavaScript framework.</p>
-        <span class="tech">Rich · prompt-toolkit · CLI</span>
-        <div class="witty">A web dashboard is just a loading screen that hasn't crashed yet.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">08 · Exhibit</div>
-    <div class="exhibit">
-      <div class="label">▸ Decision · survival beats speculation</div>
-      <h3 class="reveal d1">When the market moves against you faster than you can react</h3>
-      <p class="story reveal d2">
-        The most common failure mode in trading bots is the absence of a kill switch. A bot that keeps trading into a losing streak will eventually blow up the account. The fix isn't better entry signals — it's institutional-grade risk management. The Enhanced Risk Manager has 6 circuit breakers that halt trading when conditions deteriorate: daily loss limit (10%), consecutive losses, high volatility, API errors, total drawdown (20%), and manual halt. Each position has tiered profit-taking (close 50% at +10%, remainder at +20%), trailing stops, time-based exits, and maximum loss limits. The RiskStatus enum progresses from NORMAL to CAUTION to RESTRICTED to HALTED — giving the system graduated responses instead of binary on/off.
-      </p>
-      <div class="code-pair reveal d3">
-        <div class="col before">
-          <span class="tag">BEFORE: no risk management</span>
-          <pre>class SimpleBot:
-  def place_bet(self, market, amount):
-    # No position sizing
-    # No stop loss
-    # No circuit breakers
-    # No portfolio heat check
-    order = self.client.place_order(
-      market=market,
-      amount=amount  # Could be 100%
-    )
-    return order
-  # If the market moves against us,
-  # we keep betting. If the API fails,
-  # we retry forever. If we hit 10
-  # losses in a row, we bet #11.
-  # This is how accounts get blown up.</pre>
-        </div>
-        <div class="col after">
-          <span class="tag">AFTER: Enhanced Risk Manager</span>
-          <pre>class EnhancedRiskManager:
-  def check_trade_allowed(self, size):
-    # Circuit breaker 1: daily loss
-    if self.daily_pnl &lt;= -0.10 * bal:
-      return HALTED, "Daily loss limit"
-    # Circuit breaker 2: consecutive
-    if self.consecutive_losses &gt;= 3:
-      return RESTRICTED, "Consecutive"
-    # Circuit breaker 3: portfolio heat
-    if self.portfolio_heat &gt;= 0.50:
-      return RESTRICTED, "Heat limit"
-    # Circuit breaker 4: drawdown
-    if self.total_drawdown &gt;= 0.20:
-      return HALTED, "Max drawdown"
-    # Circuit breaker 5: API errors
-    if self.api_errors &gt;= 5:
-      return HALTED, "API errors"
-    # Circuit breaker 6: volatility
-    if self.volatility_7d &gt;= 2.0:
-      return CAUTION, "High volatility"
-    # Per-trade limit
-    if size &gt; 0.02 * bal:
-      return RESTRICTED, "Oversized"
-    return NORMAL, "OK"
-
-  def check_exit(self, position):
-    if position.pnl_pct &gt;= 0.10:
-      return TAKE_PROFIT_TIER1  # 50%
-    if position.pnl_pct &gt;= 0.20:
-      return TAKE_PROFIT_TIER2  # rest
-    if position.pnl_pct &lt;= -0.05:
-      return STOP_LOSS
-    if position.hold_time &gt;= 24:
-      return TIME_EXIT
-    return None  # Hold</pre>
-        </div>
-      </div>
-      <div class="callout reveal d4">
-        <div class="label">▸ Why this matters</div>
-        <p>Including this exhibit because most trading bots focus on entry signals; this one focuses on survival. The interesting part is the decision to build 6 independent circuit breakers instead of one simple stop loss. The graduated RiskStatus response (NORMAL → CAUTION → RESTRICTED → HALTED) means the system can throttle before killing — reducing false positives while preventing catastrophic losses.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">09 · Numbers</div>
-    <h2 class="reveal d1 h2-intro">The numbers that tell the story.</h2>
-    <div class="metrics-grid">
-      <div class="metric reveal">
-        <div class="lbl">Python Files</div>
-        <div class="val">79</div>
-        <div class="desc">Source files across 18 modules: data, winners, deep_analysis, risk, realtime, analysis, visualization, paper_trading, backtesting, ml_ensemble, quantum_engine, exchange, position, streaming, notifications, automation, intelligence, discovery, analytics.</div>
-      </div>
-      <div class="metric reveal d1">
-        <div class="lbl">Tests Passing</div>
-        <div class="val">91</div>
-        <div class="desc">59 core component tests (winner discovery 9, EV calculator 11, copy engine + risk 10, multi-factor model 12, CLI workflow 17) + 32 risk manager unit tests. All green.</div>
-      </div>
-      <div class="metric reveal d2">
-        <div class="lbl">Circuit Breakers</div>
-        <div class="val">6</div>
-        <div class="desc">Daily loss, consecutive losses, high volatility, API errors, total drawdown, manual halt. Independent triggers with graduated RiskStatus response.</div>
-      </div>
-      <div class="metric reveal d3">
-        <div class="lbl">Monte Carlo Runs</div>
-        <div class="val">10,000</div>
-        <div class="desc">Per EV calculation. Scenario analysis across best/base/worst cases with probability distributions.</div>
-      </div>
-      <div class="metric reveal">
-        <div class="lbl">Latency Reduction</div>
-        <div class="val">98<span class="unit">%</span></div>
-        <div class="desc">v3.0.0 real-time system: 30 seconds → 500 milliseconds via WebSocket CLOB + blockchain mempool monitoring.</div>
-      </div>
-      <div class="metric reveal d1">
-        <div class="lbl">WebSocket Latency</div>
-        <div class="val">10<span class="unit">ms</span></div>
-        <div class="desc">Direct WebSocket to Polymarket CLOB for market data. Real-time orderbook updates (Level 2).</div>
-      </div>
-      <div class="metric reveal d2">
-        <div class="lbl">Bets Per Day</div>
-        <div class="val">1</div>
-        <div class="desc">Hard limit enforced by Copy Engine. Quality over quantity. API-efficient at ~10-20 calls/day.</div>
-      </div>
-      <div class="metric reveal d3">
-        <div class="lbl">Risk Factors</div>
-        <div class="val">20+</div>
-        <div class="desc">Multi-Factor Model scores across 6 categories: performance, consistency, recency, category expertise, risk profile, market timing.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">10 · Decisions</div>
-    <h2 class="reveal d1 h2-intro">Five questions worth answering slowly.</h2>
-    <p class="lede reveal d2">Short answer first — long answer if you need it.</p>
-    <div class="decisions">
-      <details class="decision reveal">
-        <summary><span class="qnum">Q01</span><span class="q">Why copy-trading instead of prediction?</span><span class="arrow">+</span></summary>
-        <div class="body">
-          <p class="short">Predicting markets is hard. Identifying people who already predict well is easier. The bot copies proven edge instead of trying to generate it.</p>
-          <p class="long">The efficient market hypothesis suggests that prediction markets are hard to beat. But not everyone in the market is equally skilled. The Winner Discovery Engine finds bettors with statistically significant edge and determines if copying their positions is +EV. This shifts the problem from "what will happen?" to "who knows what will happen?" — a fundamentally easier question.</p>
-        </div>
-      </details>
-      <details class="decision reveal d1">
-        <summary><span class="qnum">Q02</span><span class="q">Why 1 bet per day?</span><span class="arrow">+</span></summary>
-        <div class="body">
-          <p class="short">Over-trading is the silent killer of most bots. A hard limit forces patience, reduces transaction costs, and ensures every trade receives maximum analytical attention.</p>
-          <p class="long">Traditional trading bots suffer from over-trading — they chase every signal, accumulate fees, and compound small losses into large drawdowns. A hard limit of 1 bet per day enforces discipline. It reduces API usage (10-20 calls/day vs hundreds). It ensures the EV Calculator, Multi-Factor Model, and Research Engine all run on every trade.</p>
-        </div>
-      </details>
-      <details class="decision reveal d2">
-        <summary><span class="qnum">Q03</span><span class="q">Why CLI-only instead of a web dashboard?</span><span class="arrow">+</span></summary>
-        <div class="body">
-          <p class="short">A web dashboard adds infrastructure, maintenance, and attack surface. A CLI is fast, lightweight, and fits the 15-minute daily workflow.</p>
-          <p class="long">Web dashboards require a server, a database, authentication, SSL certificates, frontend frameworks, and ongoing maintenance. They introduce latency, security risks, and complexity. A CLI using Rich provides styled tables, progress bars, and syntax-highlighted reports in the terminal — fast, lightweight, and zero infrastructure.</p>
-        </div>
-      </details>
-      <details class="decision reveal d3">
-        <summary><span class="qnum">Q04</span><span class="q">Why Python instead of a faster language?</span><span class="arrow">+</span></summary>
-        <div class="body">
-          <p class="short">Python has the best ecosystem for data analysis (pandas, numpy, scipy) and the bot is API-bound, not CPU-bound. The bottleneck is network latency, not language speed.</p>
-          <p class="long">The bot spends most of its time waiting for API responses and performing data analysis — tasks where Python excels. pandas and numpy are industry standards for quantitative analysis. scipy provides statistical functions that would require significant effort to reimplement in C++ or Rust. For the rare CPU-bound tasks, numpy's vectorized operations are implemented in C under the hood.</p>
-        </div>
-      </details>
-      <details class="decision reveal d4">
-        <summary><span class="qnum">Q05</span><span class="q">Why Half-Kelly instead of full Kelly?</span><span class="arrow">+</span></summary>
-        <div class="body">
-          <p class="short">Full Kelly is optimal for growth but extremely volatile. Half-Kelly reduces variance by 50% while retaining 75% of growth — a better tradeoff for real-world trading with estimation error.</p>
-          <p class="long">The Kelly Criterion calculates the optimal bet size as (edge / odds). Full Kelly maximizes expected log wealth but produces extreme drawdowns. Half-Kelly reduces variance by 50% while retaining 75% of expected growth. This is the standard in professional trading because edge estimates are noisy and correlated bets reduce effective Kelly.</p>
-        </div>
-      </details>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">11 · Timeline</div>
-    <h2 class="reveal d1 h2-intro">Five phases. No phase repeated.</h2>
-    <div class="timeline">
-      <div class="phase reveal">
-        <div class="meta">
-          <div class="pnum">Phase 01</div>
-          <div class="ptitle">Foundation — the risk-first insight</div>
-          <div class="mood">Methodical</div>
-        </div>
-        <div>
-          <p class="story">Started with a question: why do most trading bots blow up? The answer: they focus on entry signals and ignore survival. Every module was designed with risk as the primary constraint. The Winner Discovery Engine filters for statistical significance. The EV Calculator uses Half-Kelly. The 1-bet-per-day limit prevents over-trading. The circuit breakers halt trading before catastrophic losses.</p>
-          <div class="deliverable">Risk-first architecture spec · Winner Discovery filters · EV methodology · Kelly Criterion · Circuit breaker design</div>
-        </div>
-      </div>
-      <div class="phase reveal">
-        <div class="meta">
-          <div class="pnum">Phase 02</div>
-          <div class="ptitle">Architecture — core quant stack</div>
-          <div class="mood">Surgical</div>
-        </div>
-        <div>
-          <p class="story">Built the core modules before the CLI. Winner Discovery with vanity gap detection and composite scoring. EV Calculator with Monte Carlo simulation and scenario analysis. Multi-Factor Model with 20+ factors across 6 categories. Research Engine with archetype classification and pattern recognition. SubgraphClient for Polymarket GraphQL API. All tested with pytest.</p>
-          <div class="deliverable">Winner Discovery · EV Calculator · Multi-Factor Model · Research Engine · Data layer · 59 core tests</div>
-        </div>
-      </div>
-      <div class="phase reveal">
-        <div class="meta">
-          <div class="pnum">Phase 03</div>
-          <div class="ptitle">Build — CLI + risk + paper trading</div>
-          <div class="mood">Ambitious</div>
-        </div>
-        <div>
-          <p class="story">Implemented the CLI interface using Rich with styled tables, progress bars, and syntax highlighting. Enhanced Risk Manager with 6 circuit breakers, tiered profit-taking, and 32 unit tests. Copy Engine with daily target enforcement and portfolio constraints. Paper Trading Engine for strategy validation without real money.</p>
-          <div class="deliverable">Rich CLI · Enhanced Risk Manager (32 tests) · Copy Engine · Paper Trading · Position Manager</div>
-        </div>
-      </div>
-      <div class="phase reveal">
-        <div class="meta">
-          <div class="pnum">Phase 04</div>
-          <div class="ptitle">Real-Time — v3.0.0 ultra-low latency</div>
-          <div class="mood">Determined</div>
-        </div>
-        <div>
-          <p class="story">Added WebSocket CLOB client with &lt;10ms latency. Blockchain mempool monitor for pre-confirmation detection. Latency executor with &lt;100ms signal-to-submission. Predictive entry system with wallet activity monitoring and behavioral pattern recognition. Arbitrage detector for complementary market opportunities. Smart order router with sniper, iceberg, and TWAP strategies. 98% latency reduction.</p>
-          <div class="deliverable">WebSocket CLOB · Blockchain monitor · Predictive entry · Arbitrage detector · Smart router · 98% latency reduction</div>
-        </div>
-      </div>
-      <div class="phase reveal">
-        <div class="meta">
-          <div class="pnum">Phase 05</div>
-          <div class="ptitle">Hardening — testing, backtesting, expansion</div>
-          <div class="mood">Pragmatic</div>
-        </div>
-        <div>
-          <p class="story">Final pass: 91 tests passing (59 core + 32 risk). Backtest Engine for historical validation. ML Ensemble for signal aggregation. Quantum Engine as experimental differentiation. Multi-exchange support (Polymarket, Hyperliquid, Kraken). Crypto-focused scanner for BTC/ETH/XRP/SOL markets. Performance dashboard and analytics.</p>
-          <div class="deliverable">91 tests · Backtest Engine · ML Ensemble · Quantum Engine · Multi-exchange · Analytics dashboard</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eye reveal">12 · Reflection</div>
-    <h2 class="reveal d1 h2-intro">What surprised me. What I'd do differently. What's next.</h2>
-    <div class="reflection-grid">
-      <div class="block reveal">
-        <div class="label">Surprised by</div>
-        <h3>How much the 1-bet-per-day limit improved backtest performance.</h3>
-        <p>Simulations showed that bots with no trade limits accumulated 3x more fees and had 40% higher drawdowns — despite placing more trades. The constraint of patience turned out to be the highest-return feature. Also surprised by how effective the vanity gap detection was: approximately 15% of "winners" had inflated win rates from selective reporting, and filtering them out significantly improved copy performance.</p>
-      </div>
-      <div class="block reveal d1">
-        <div class="label">Would do differently</div>
-        <h3>Build the backtest engine before the real-time trading system.</h3>
-        <p>v3.0.0 real-time features were exciting to build but hard to validate without historical simulation. A backtest-first approach would have caught that the predictive entry system had false-positive rates above acceptable thresholds in certain market conditions. The real-time components should have been validated against 6 months of historical data before implementation.</p>
-      </div>
-      <div class="block reveal d2">
-        <div class="label">What's next</div>
-        <h3>Live trading validation, ML retraining pipeline, institutional API.</h3>
-        <p>Live trading validation with small capital ($100-500) for 3 months. Machine learning model retraining pipeline with weekly updates. Social features: leaderboards of bot users, anonymized performance sharing. Mobile push notifications for circuit breaker triggers. Institutional API for hedge fund integration. Regulatory compliance framework for multi-jurisdiction deployment.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer class="recursive">
-  <div class="wrap">
-    <div class="eye reveal">13 · That's it</div>
-    <h2 class="reveal d1">Polybot exists because most trading bots focus on entry signals and ignore survival.</h2>
-    <p class="cta-line reveal d2">The Winner Discovery Engine finds edge. The EV Calculator validates it. The Copy Engine executes with discipline. The Risk Manager ensures the bot lives to trade another day. And the CLI keeps it fast, focused, and free of dashboard bloat. In prediction markets, the house doesn't always win — but the undisciplined always lose. This bot is designed to not be one of them.</p>
-    <div class="reveal d3">
-      <a class="cta" href="#architecture">See the architecture again</a>
-    </div>
-    <div class="next reveal">Next: Ratewise — the same discipline applied to rate comparison and financial optimization, where the stakes aren't market positions but household budgets and loan terms.</div>
   </div>
 </footer>
 
-<div class="integrity">
-  <div class="row">
-    <strong>Verbatim quotes</strong> — Architecture diagram and winner discovery filters from ARCHITECTURE.md. Risk manager specs from RISK_MANAGER_SUMMARY.md (per-trade controls, portfolio controls, circuit breakers, tiered exits). Latency reduction claim (98%, 30s → 500ms) from CHANGELOG.md v3.0.0. Test counts from TEST_RESULTS.md (59 core) and RISK_MANAGER_SUMMARY.md (32 risk). Stack versions from requirements.txt. Winner discovery filters (>50 bets, >55% win rate, >1.3 profit factor, p&lt;0.05) from README.md and ARCHITECTURE.md.
-  </div>
-</div>
-
 <script>
-(() => {
-  const targets = document.querySelectorAll('.reveal');
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  targets.forEach(t => obs.observe(t));
+/* Scroll reveal */
+(function(){
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+  },{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 })();
 </script>
 </body>

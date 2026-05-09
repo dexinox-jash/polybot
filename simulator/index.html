@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyBot v3.0.0 — Risk-First Copy Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-panel: #161b22;
+    --bg-input: #0d1117;
+    --border: #30363d;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --white: #e6edf3;
+    --gray: #8b949e;
+    --dim: #484f58;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    color: var(--white);
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .terminal-window {
+    width: 100%;
+    max-width: 900px;
+    height: 100%;
+    max-height: 700px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: linear-gradient(180deg, #1f242c 0%, #161b22 100%);
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  .traffic-lights {
+    display: flex;
+    gap: 8px;
+  }
+  .traffic-lights span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .tl-red { background: #ff5f56; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.2); }
+  .tl-yellow { background: #ffbd2e; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.2); }
+  .tl-green { background: #27c93f; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.2); }
+  .title-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    letter-spacing: 0.3px;
+  }
+  .title-bar-spacer { width: 52px; }
+  .terminal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+  }
+  .terminal-body::-webkit-scrollbar { width: 8px; }
+  .terminal-body::-webkit-scrollbar-track { background: transparent; }
+  .terminal-body::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 4px; }
+  .line { white-space: pre-wrap; word-break: break-word; margin-bottom: 1px; }
+  .prompt-line { display: flex; align-items: baseline; margin-top: 4px; }
+  .prompt { color: var(--green); font-weight: 600; margin-right: 8px; flex-shrink: 0; }
+  .input-area {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+    min-width: 0;
+  }
+  #cmd-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--white);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.6;
+    flex: 1;
+    caret-color: var(--green);
+    min-width: 20px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.15em;
+    background: var(--green);
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .cmd-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-panel);
+  }
+  .cmd-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--gray);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .cmd-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(34,197,94,0.08);
+  }
+  .cmd-btn:active { transform: translateY(1px); }
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .yellow { color: var(--yellow); }
+  .blue { color: var(--blue); }
+  .cyan { color: var(--cyan); }
+  .gray { color: var(--gray); }
+  .dim { color: var(--dim); }
+  @media (max-width: 640px) {
+    body { padding: 8px; }
+    .terminal-window { border-radius: 8px; max-height: none; }
+    .terminal-body { padding: 10px 12px; font-size: 12px; }
+    .title-text { font-size: 11px; }
+    .cmd-btn { padding: 4px 8px; font-size: 11px; }
+    #cmd-input { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="terminal-window">
+  <div class="title-bar">
+    <div class="traffic-lights">
+      <span class="tl-red"></span>
+      <span class="tl-yellow"></span>
+      <span class="tl-green"></span>
+    </div>
+    <div class="title-text">PolyBot v3.0.0 — Risk-First Copy Trading</div>
+    <div class="title-bar-spacer"></div>
+  </div>
+  <div class="terminal-body" id="terminal"></div>
+  <div class="cmd-buttons" id="cmd-buttons">
+    <button class="cmd-btn" data-cmd="status">status</button>
+    <button class="cmd-btn" data-cmd="scan">scan</button>
+    <button class="cmd-btn" data-cmd="analyze">analyze</button>
+    <button class="cmd-btn" data-cmd="portfolio">portfolio</button>
+    <button class="cmd-btn" data-cmd="risk">risk</button>
+    <button class="cmd-btn" data-cmd="help">help</button>
+    <button class="cmd-btn" data-cmd="clear">clear</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const terminal = document.getElementById('terminal');
+  const cmdButtons = document.getElementById('cmd-buttons');
+  let history = JSON.parse(localStorage.getItem('polybot_history') || '[]');
+  let historyIndex = history.length;
+  let isTyping = false;
+  let typingQueue = [];
+  let currentPrompt = null;
+
+  function saveHistory() {
+    localStorage.setItem('polybot_history', JSON.stringify(history.slice(-50)));
+  }
+
+  function scrollToBottom() {
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function createPrompt() {
+    const line = document.createElement('div');
+    line.className = 'prompt-line';
+    line.innerHTML = '<span class="prompt">polybot&gt;</span><div class="input-area"><input type="text" id="cmd-input" autocomplete="off" spellcheck="false" /><span class="cursor"></span></div>';
+    terminal.appendChild(line);
+    const input = line.querySelector('#cmd-input');
+    input.focus();
+    input.addEventListener('keydown', onInputKey);
+    currentPrompt = { line, input };
+    scrollToBottom();
+    return input;
+  }
+
+  function removePrompt() {
+    if (currentPrompt) {
+      currentPrompt.line.remove();
+      currentPrompt = null;
+    }
+  }
+
+  function addLine(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'line' + (cls ? ' ' + cls : '');
+    div.textContent = text;
+    terminal.appendChild(div);
+    scrollToBottom();
+    return div;
+  }
+
+  function addRaw(html) {
+    const div = document.createElement('div');
+    div.className = 'line';
+    div.innerHTML = html;
+    terminal.appendChild(div);
+    scrollToBottom();
+    return div;
+  }
+
+  function typeText(text, speed = 12, onDone) {
+    return new Promise(resolve => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      terminal.appendChild(div);
+      let i = 0;
+      function step() {
+        if (i < text.length) {
+          div.textContent += text[i];
+          i++;
+          scrollToBottom();
+          setTimeout(step, speed);
+        } else {
+          if (onDone) onDone();
+          resolve();
+        }
+      }
+      step();
+    });
+  }
+
+  function typeLines(lines, speed = 12, lineDelay = 30) {
+    return new Promise(resolve => {
+      let idx = 0;
+      async function next() {
+        if (idx >= lines.length) { resolve(); return; }
+        await typeText(lines[idx], speed);
+        idx++;
+        setTimeout(next, lineDelay);
+      }
+      next();
+    });
+  }
+
+  function printInstant(htmlOrText, isHtml = false) {
+    if (isHtml) addRaw(htmlOrText);
+    else addLine(htmlOrText);
+  }
+
+  // ─── Command Outputs ───
+
+  const outputs = {
+    status: () => {
+      const html = `
+<span class="cyan">╔══════════════════════════════════════════════════════════════╗</span>
+<span class="cyan">║  BOT STATUS                                                  ║</span>
+<span class="cyan">╠══════════════════════════════════════════════════════════════╣</span>
+<span class="cyan">║</span>  <span class="green">[API Keys]</span>                                                  <span class="cyan">║</span>
+<span class="cyan">║</span>    thegraph    : <span class="green">[OK]</span>                                        <span class="cyan">║</span>
+<span class="cyan">║</span>    polymarket  : <span class="green">[OK]</span>                                        <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">[Portfolio]</span>                                                 <span class="cyan">║</span>
+<span class="cyan">║</span>    Bankroll:     $10,000.00                                  <span class="cyan">║</span>
+<span class="cyan">║</span>    Total P&L:    <span class="green">$+847.50  (+8.5%)</span>                           <span class="cyan">║</span>
+<span class="cyan">║</span>    Active positions: 3/5                                     <span class="cyan">║</span>
+<span class="cyan">║</span>    Portfolio Heat: 42%  <span class="yellow">[████░░░░░░]</span> NORMAL                  <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">[Daily Target]</span>                                              <span class="cyan">║</span>
+<span class="cyan">║</span>    Bets today: 1/1  <span class="green">✓ TARGET MET</span>                             <span class="cyan">║</span>
+<span class="cyan">║</span>    Status: <span class="yellow">RESTRICTED</span> (Daily limit reached)                  <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">[Risk Status]</span>                                               <span class="cyan">║</span>
+<span class="cyan">║</span>    Overall: <span class="green">NORMAL</span>                                           <span class="cyan">║</span>
+<span class="cyan">║</span>    Daily Drawdown: 3.2% / 10% limit                          <span class="cyan">║</span>
+<span class="cyan">║</span>    Consecutive Losses: 0                                     <span class="cyan">║</span>
+<span class="cyan">╚══════════════════════════════════════════════════════════════╝</span>`;
+      return { type: 'instant', html };
+    },
+
+    scan: () => {
+      const html = `
+<span class="blue">[SCAN]</span> Finding statistically proven winners...
+  <span class="gray">-> Analyzing 2,847 traders...</span>
+  <span class="gray">-> Filtering: >50 bets, >55% WR, >1.3 PF, p&lt;0.05</span>
+
+  <span class="green">[OK] Found 5 verified winners</span>
+
+<span class="cyan">┌────┬────────────────┬──────────┬───────────┬────────┬─────────────┐</span>
+<span class="cyan">│</span> <span class="yellow">#</span>  <span class="cyan">│</span> <span class="yellow">Name</span>           <span class="cyan">│</span> <span class="yellow">Win Rate</span> <span class="cyan">│</span> <span class="yellow">Profit</span>    <span class="cyan">│</span> <span class="yellow">Score</span>  <span class="cyan">│</span> <span class="yellow">Archetype</span>   <span class="cyan">│</span>
+<span class="cyan">├────┼────────────────┼──────────┼───────────┼────────┼─────────────┤</span>
+<span class="cyan">│</span> 1  <span class="cyan">│</span> alphawin.eth   <span class="cyan">│</span> 62.0%    <span class="cyan">│</span> $45,600   <span class="cyan">│</span> 87.5   <span class="cyan">│</span> Sniper      <span class="cyan">│</span>
+<span class="cyan">│</span> 2  <span class="cyan">│</span> gammaedge.eth  <span class="cyan">│</span> 65.0%    <span class="cyan">│</span> $52,300   <span class="cyan">│</span> 91.3   <span class="cyan">│</span> Accumulator <span class="cyan">│</span>
+<span class="cyan">│</span> 3  <span class="cyan">│</span> deltaflow.eth  <span class="cyan">│</span> 59.0%    <span class="cyan">│</span> $32,100   <span class="cyan">│</span> 82.1   <span class="cyan">│</span> Swinger     <span class="cyan">│</span>
+<span class="cyan">│</span> 4  <span class="cyan">│</span> omegawin.eth   <span class="cyan">│</span> 61.0%    <span class="cyan">│</span> $44,500   <span class="cyan">│</span> 88.9   <span class="cyan">│</span> Sniper      <span class="cyan">│</span>
+<span class="cyan">│</span> 5  <span class="cyan">│</span> betaprofit.eth <span class="cyan">│</span> 58.0%    <span class="cyan">│</span> $28,900   <span class="cyan">│</span> 78.2   <span class="cyan">│</span> Value       <span class="cyan">│</span>
+<span class="cyan">└────┴────────────────┴──────────┴───────────┴────────┴─────────────┘</span>`;
+      return { type: 'instant', html };
+    },
+
+    analyze: () => {
+      const html = `
+<span class="blue">[ANALYZE]</span> Running Monte Carlo simulation (10,000 runs)...
+  <span class="gray">-> Analyzing gammaedge.eth recent positions...</span>
+  <span class="gray">-> Calculating expected value...</span>
+  <span class="gray">-> Running scenario analysis...</span>
+
+  <span class="green">[OK] Analysis complete</span>
+
+<span class="cyan">╔══════════════════════════════════════════════════════════════╗</span>
+<span class="cyan">║  TODAY'S BEST BET                                            ║</span>
+<span class="cyan">╠══════════════════════════════════════════════════════════════╣</span>
+<span class="cyan">║</span>  Market: Will BTC close above $95K today?                    <span class="cyan">║</span>
+<span class="cyan">║</span>  Winner: gammaedge.eth (65% WR, $52.3K profit)               <span class="cyan">║</span>
+<span class="cyan">║</span>  Direction: YES                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  Current Price: $0.62                                        <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">[EV Analysis]</span>                                               <span class="cyan">║</span>
+<span class="cyan">║</span>    Expected Value: <span class="green">+$124 (12.4% edge)</span>                        <span class="cyan">║</span>
+<span class="cyan">║</span>    Confidence: <span class="green">HIGH</span>                                          <span class="cyan">║</span>
+<span class="cyan">║</span>    Kelly Fraction: 0.08 (Half-Kelly: 0.04)                   <span class="cyan">║</span>
+<span class="cyan">║</span>    Recommended Size: $400 (4% of bankroll)                   <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="blue">[Scenario Analysis]</span>                                         <span class="cyan">║</span>
+<span class="cyan">║</span>    Best Case:    <span class="green">+$248  (25% probability)</span>                    <span class="cyan">║</span>
+<span class="cyan">║</span>    Base Case:    <span class="green">+$124  (50% probability)</span>                    <span class="cyan">║</span>
+<span class="cyan">║</span>    Worst Case:   <span class="red">-$100  (25% probability)</span>                    <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="yellow">[Risk Check]</span>                                                <span class="cyan">║</span>
+<span class="cyan">║</span>    Portfolio Heat: 42% → 46% (ACCEPTABLE)                    <span class="cyan">║</span>
+<span class="cyan">║</span>    Max Loss: $100 (1% of bankroll)                           <span class="cyan">║</span>
+<span class="cyan">║</span>    Time Exit: 24 hours                                       <span class="cyan">║</span>
+<span class="cyan">╚══════════════════════════════════════════════════════════════╝</span>`;
+      return { type: 'instant', html };
+    },
+
+    portfolio: () => {
+      const html = `
+<span class="blue">[PORTFOLIO]</span> Current positions and P&L
+
+<span class="cyan">┌──────────────────────────────────────────────────────────────┐</span>
+<span class="cyan">│</span> Active Positions (3/5)                                       <span class="cyan">│</span>
+<span class="cyan">├──────────────────────────────────────────────────────────────┤</span>
+<span class="cyan">│</span> 1. Will ETH ETF approve?       YES    $350   <span class="green">+$42 (+12%)</span>   <span class="cyan">│</span>
+<span class="cyan">│</span> 2. Fed rate cut in March?      NO     $400   <span class="red">-$18 (-4.5%)</span>  <span class="cyan">│</span>
+<span class="cyan">│</span> 3. BTC above $95K?             YES    $400   <span class="green">+$823 (+206%)</span> <span class="cyan">│</span>
+<span class="cyan">├──────────────────────────────────────────────────────────────┤</span>
+<span class="cyan">│</span> Total Invested: $1,150                                       <span class="cyan">│</span>
+<span class="cyan">│</span> Unrealized P&L: <span class="green">+$847 (+73.7%)</span>                               <span class="cyan">│</span>
+<span class="cyan">│</span> Portfolio Heat:  42%                                         <span class="cyan">│</span>
+<span class="cyan">└──────────────────────────────────────────────────────────────┘</span>`;
+      return { type: 'instant', html };
+    },
+
+    risk: () => {
+      const html = `
+<span class="blue">[RISK]</span> Enhanced Risk Manager Status
+
+<span class="green">Circuit Breakers:</span>
+  <span class="green">✓</span> Daily Loss Limit     : 3.2% / 10%   <span class="green">[ACTIVE]</span>
+  <span class="green">✓</span> Consecutive Losses   : 0 / 3        <span class="green">[ACTIVE]</span>
+  <span class="green">✓</span> High Volatility      : Normal       <span class="green">[ACTIVE]</span>
+  <span class="green">✓</span> API Error Rate       : 0%           <span class="green">[ACTIVE]</span>
+  <span class="green">✓</span> Total Drawdown       : 3.2% / 20%   <span class="green">[ACTIVE]</span>
+  <span class="green">✓</span> Manual Halt          : Not triggered<span class="green">[ACTIVE]</span>
+
+<span class="yellow">Portfolio Controls:</span>
+  Heat: 42% / 50% max
+  Positions: 3 / 5 max
+  Max Loss/Trade: 1% / 2% limit
+
+<span class="blue">Exits Configured:</span>
+  Stop Loss: -5%
+  Take Profit 1: +10% (50% of position)
+  Take Profit 2: +20% (remainder)
+  Trailing Stop: +15%
+  Time Exit: 24 hours`;
+      return { type: 'instant', html };
+    },
+
+    help: () => {
+      const html = `
+<span class="cyan">╔══════════════════════════════════════════════════════════════╗</span>
+<span class="cyan">║  POLYBOT v3.0.0 — AVAILABLE COMMANDS                         ║</span>
+<span class="cyan">╠══════════════════════════════════════════════════════════════╣</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">status</span>    — Show bot status dashboard                      <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">scan</span>      — Find top winning bettors to copy               <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">analyze</span>   — Run deep EV analysis on best opportunity       <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">portfolio</span> — Show current positions and P&L                 <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">risk</span>      — Display risk dashboard and circuit breakers    <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">help</span>      — Show this help message                         <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="green">clear</span>     — Clear the terminal screen                      <span class="cyan">║</span>
+<span class="cyan">║</span>                                                              <span class="cyan">║</span>
+<span class="cyan">║</span>  <span class="gray">Tip: Use ↑/↓ arrows to recall command history.</span>               <span class="cyan">║</span>
+<span class="cyan">╚══════════════════════════════════════════════════════════════╝</span>`;
+      return { type: 'instant', html };
+    }
+  };
+
+  async function runCommand(cmdRaw) {
+    const cmd = cmdRaw.trim().toLowerCase();
+    if (!cmd) return;
+
+    if (history.length === 0 || history[history.length - 1] !== cmdRaw) {
+      history.push(cmdRaw);
+      if (history.length > 50) history.shift();
+      historyIndex = history.length;
+      saveHistory();
+    }
+
+    removePrompt();
+    addLine('polybot> ' + cmdRaw, 'green');
+
+    if (cmd === 'clear') {
+      terminal.innerHTML = '';
+      createPrompt();
+      return;
+    }
+
+    if (outputs[cmd]) {
+      const out = outputs[cmd]();
+      if (out.type === 'instant') {
+        // Simulate a brief typing delay for realism
+        await new Promise(r => setTimeout(r, 180));
+        const lines = out.html.trim().split('\n');
+        for (const line of lines) {
+          addRaw(line.trim());
+        }
+      }
+    } else {
+      await new Promise(r => setTimeout(r, 200));
+      addLine('Unknown command: "' + cmd + '"', 'red');
+      addLine('Type "help" for available commands.', 'gray');
+    }
+
+    addLine('');
+    createPrompt();
+  }
+
+  function onInputKey(e) {
+    const input = e.target;
+    if (e.key === 'Enter') {
+      const val = input.value;
+      if (val.trim()) runCommand(val);
+      else { removePrompt(); createPrompt(); }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        historyIndex--;
+        input.value = history[historyIndex];
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        input.value = history[historyIndex];
+      } else {
+        historyIndex = history.length;
+        input.value = '';
+      }
+    }
+  }
+
+  cmdButtons.addEventListener('click', e => {
+    if (e.target.classList.contains('cmd-btn')) {
+      const cmd = e.target.dataset.cmd;
+      if (currentPrompt) {
+        currentPrompt.input.value = cmd;
+        currentPrompt.input.focus();
+        runCommand(cmd);
+      }
+    }
+  });
+
+  // Click anywhere in terminal body to focus input
+  terminal.addEventListener('click', e => {
+    if (currentPrompt) currentPrompt.input.focus();
+  });
+
+  // ─── Boot Sequence ───
+  const bootLines = [
+    { text: 'PolyBot v3.0.0 — Risk-First Copy Trading', cls: 'cyan', speed: 18 },
+    { text: '══════════════════════════════════════════', cls: 'dim', speed: 8 },
+    { text: '[INIT] Loading configuration...', cls: 'gray', speed: 14 },
+    { text: '[INIT] Connecting to TheGraph API...', cls: 'gray', speed: 14 },
+    { text: '  -> Subgraph: polymarket-mainnet', cls: 'dim', speed: 10 },
+    { text: '  -> Status: <span class="green">CONNECTED</span>', cls: '', speed: 12 },
+    { text: '[INIT] Connecting to Polymarket API...', cls: 'gray', speed: 14 },
+    { text: '  -> Endpoint: https://polymarket.com/api', cls: 'dim', speed: 10 },
+    { text: '  -> Status: <span class="green">CONNECTED</span>', cls: '', speed: 12 },
+    { text: '[INIT] Loading risk module...', cls: 'gray', speed: 14 },
+    { text: '  -> Daily loss limit: 10%', cls: 'dim', speed: 10 },
+    { text: '  -> Max positions: 5', cls: 'dim', speed: 10 },
+    { text: '  -> Max loss/trade: 2%', cls: 'dim', speed: 10 },
+    { text: '  -> Status: <span class="green">ACTIVE</span>', cls: '', speed: 12 },
+    { text: '[INIT] Loading portfolio tracker...', cls: 'gray', speed: 14 },
+    { text: '  -> Bankroll: $10,000.00', cls: 'dim', speed: 10 },
+    { text: '  -> Active positions: 3/5', cls: 'dim', speed: 10 },
+    { text: '  -> Status: <span class="green">LOADED</span>', cls: '', speed: 12 },
+    { text: '[INIT] Initializing EV analyzer...', cls: 'gray', speed: 14 },
+    { text: '  -> Monte Carlo runs: 10,000', cls: 'dim', speed: 10 },
+    { text: '  -> Status: <span class="green">READY</span>', cls: '', speed: 12 },
+    { text: '', cls: '', speed: 0 },
+    { text: '<span class="green">[OK] All systems operational.</span> Type "help" for commands.', cls: '', speed: 16 },
+  ];
+
+  async function boot() {
+    for (const item of bootLines) {
+      if (!item.text) { addLine(''); continue; }
+      if (item.text.includes('<span')) {
+        // Contains HTML — type the plain text then replace with HTML after
+        const plain = item.text.replace(/<[^>]+>/g, '');
+        await typeText(plain, item.speed);
+        // Replace last line with HTML version
+        const last = terminal.lastElementChild;
+        if (last) last.innerHTML = item.text;
+      } else {
+        await typeText(item.text, item.speed);
+        const last = terminal.lastElementChild;
+        if (last && item.cls) last.className = 'line ' + item.cls;
+      }
+    }
+    addLine('');
+    createPrompt();
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
